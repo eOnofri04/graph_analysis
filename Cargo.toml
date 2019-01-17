@@ -1,0 +1,6 @@
+[package]
+name = "graph_analysis"
+version = "0.1.0"
+authors = ["eOnofri04 <elia.onofri@mensa.it>"]
+
+[dependencies]
