@@ -23,11 +23,23 @@ pub struct Graph {
 }
 
 impl Vertex {
-	fn new(id: i32, weight: i32, color: i32) -> Vertex {
+	fn new(id : i32, weight : i32, color : i32) -> Vertex {
         Vertex{
         	i : id,
         	w : weight,
         	c : color
+        }
+    }
+}
+
+impl Edge {
+	fn new(id : i32, weight : i32, color : i32, source : i32, dest : i32) -> Edge {
+        Edge{
+        	i : id,
+        	w : weight,
+        	c : color,
+        	s : source,
+        	d : dest
         }
     }
 }
@@ -46,11 +58,32 @@ impl Graph{
 		let ret = self.iv.get();
 		self.v.push(Vertex::new(ret, w, c));
 		self.iv.set(ret+1);
-		ret
+		return ret;
+	}
+
+	fn has_vertex(& self, i : i32) -> bool{
+		let mut flag = false;
+		let mut count = 0;
+		let v = self.v;
+		let len = v.len();
+		while !flag && count < len {
+			if v[count].i == i{
+				flag = true;
+			}
+			count = count + 1;
+		}
+		return flag;
+	}
+
+	fn add_edge(&mut self, w : i32, c : i32, s : i32, d : i32) -> i32{
+		assert!(self.has_vertex(d) && self.has_vertex(s));
+		let ret = self.ie.get();
+		self.e.push(Edge::new(ret, w, c, s, d));
+		return ret;
 	}
 
 
-	fn print_vertex(mut self){
+	fn print_vertex(self){
 		for vert in self.v{
 			println!("id : {}, weight : {}, color : {}", vert.i, vert.w, vert.c);
 		}
