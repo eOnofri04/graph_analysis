@@ -62,32 +62,49 @@ impl Graph{
 	}
 
 	fn has_vertex(& self, i : i32) -> bool{
-		let mut flag = false;
-		let mut count = 0;
-		let v = self.v;
-		let len = v.len();
-		while !flag && count < len {
-			if v[count].i == i{
-				flag = true;
+		for vertex in &self.v{
+			if vertex.i == i{
+				return true
 			}
-			count = count + 1;
 		}
-		return flag;
+		return false
 	}
 
 	fn add_edge(&mut self, w : i32, c : i32, s : i32, d : i32) -> i32{
 		assert!(self.has_vertex(d) && self.has_vertex(s));
 		let ret = self.ie.get();
 		self.e.push(Edge::new(ret, w, c, s, d));
+		self.ie.set(ret+1);
 		return ret;
 	}
 
-
-	fn print_vertex(self){
-		for vert in self.v{
-			println!("id : {}, weight : {}, color : {}", vert.i, vert.w, vert.c);
+	fn has_edge(& self, i : i32) -> bool{
+		for edge in &self.e{
+			if edge.i == i{
+				return true
+			}
 		}
+		return false
 	}
+
+
+	fn print_vertex(& self){
+		println!("\n===VERTEX LIST===");
+		for vert in &self.v{
+			println!("Vertex `{}` has weight `{}` and color `{}`", vert.i, vert.w, vert.c);
+		}
+		println!("");
+	}
+
+	fn print_edges(& self){
+		println!("\n===EDGE LIST===");
+		for edge in &self.e{
+			println!("Edge `{} : {} -> {}` has weight `{}` color `{}`", edge.i, edge.s, edge.d, edge.w, edge.c);
+		}
+		println!("");
+	}
+
+	
 }
 
 fn main() {
@@ -96,6 +113,13 @@ fn main() {
     g.add_vertex(1, 1);
     g.add_vertex(2, 1);
     g.add_vertex(1, 3);
+    g.add_vertex(3, 3);
+    g.add_edge(1, 1, 1, 2);
+    g.add_edge(1, 1, 0, 2);
+    g.add_edge(1, 1, 2, 2);
+    g.add_edge(1, 1, 1, 3);
+
     g.print_vertex();
+    g.print_edges();
 
 }
