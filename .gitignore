@@ -5,3 +5,6 @@
 
 Cargo.lock
 
+# Eclipse
+
+.project
