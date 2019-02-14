@@ -1,5 +1,8 @@
 extern crate petgraph;
 
+use petgraph::stable_graph::*;
+
+/*
 pub struct Node{
 	w : i32,            // weight
 	c : i32             // color
@@ -13,28 +16,49 @@ impl Node {
         }
     }
 }
+*/
+
+fn node_info(graph:&StableGraph<&(i32, i32), &(i32, i32)>, node:&NodeIndex) {
+	let node_data = graph.node_weight(*node);	
+	match node_data{
+		Some(x) => println!("{:?} has weight = {} and color = {}", node, x.0, x.1),
+		None    => println!("ERROR: {:?} do not belong to the Graph.", node),
+	}
+}
+
+fn edge_info(g:&StableGraph<&(i32, i32), &(i32, i32)>, e:&EdgeIndex) {
+	let edge = g.edge_weight(*e);	
+	match edge{
+		Some(x) => println!("{:?} has weight = {} and color = {}", e, x.0, x.1),
+		None    => println!("ERROR: {:?} do not belong to the Graph.", edge),
+	}
+}
 
 fn main() {
-	use petgraph::stable_graph::StableGraph;
     println!("Hello, world!");
-	let mut deps = StableGraph::<&(i32, i32), &str>::new();
-	let a = deps.add_node(&(1,1));
-/*	let b = deps.add_node(&Node::new(1, 1));
-	let c = deps.add_node(&Node::new(2, 2));
-	let d = deps.add_node(&Node::new(1, 2));
-	let e = deps.add_node(&Node::new(2, 2));
-*/
+	let mut deps = StableGraph::<&(i32, i32), &(i32, i32)>::new();
+	let A = deps.add_node(&(1, 2));
+	let B = deps.add_node(&(1, 1));
+	let C = deps.add_node(&(1, 3));
+	let D = deps.add_node(&(2, 1));
+	let E = deps.add_node(&(2, 2));
+
+	let a = deps.add_edge(A, B, &(1, 1));
+	let b = deps.add_edge(A, C, &(1, 1));
+	let c = deps.add_edge(C, D, &(1, 1));
+	let d = deps.add_edge(C, E, &(1, 1));
+	let e = deps.add_edge(D, E, &(1, 1));
+
 /*	deps.extend_with_edges(&[
-    	(a, b, &Node::new(1, 1)), (a, c, &Node::new(1, 1)),
-    	(c, d, &Node::new(1, 1)), (c, e, &Node::new(1, 1)), (d, e, &Node::new(1, 1)),
+    	(a, b, (1, 1)), (a, c, (1, 1)),
+    	(c, d, (1, 1)), (c, e, (1, 1)), (d, e, (1, 1)),
 	]);
 */	
-//	deps.remove_node(b);
+	deps.remove_node(A);
+//	println!("{:?}", deps);
+
 	
-	let result = deps.node_weight(a);
-	
-	match result{
-		Some(x) => println!("Vertex weight = {}, color = {}", x.0, x.1),
-		None    => println!("ERROR: Vertex not found."),
-	}
+	node_info(&deps, &A);
+	node_info(&deps, &B);
+	edge_info(&deps, &c);
 }
