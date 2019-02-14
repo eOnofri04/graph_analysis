@@ -18,6 +18,8 @@ impl Node {
 }
 */
 
+
+
 fn node_info(graph:&StableGraph<&(i32, i32), &(i32, i32)>, node:&NodeIndex) {
 	let node_data = graph.node_weight(*node);	
 	match node_data{
@@ -33,6 +35,8 @@ fn edge_info(g:&StableGraph<&(i32, i32), &(i32, i32)>, e:&EdgeIndex) {
 		None    => println!("ERROR: {:?} do not belong to the Graph.", edge),
 	}
 }
+
+
 
 fn main() {
     println!("Hello, world!");

@@ -8,19 +8,25 @@ This [Rust](https://www.rust-lang.org) repository, developed during the course o
  - build a tool to reduce a graph by an edge `e`.
  - build a tool that reduce a non-properly-colored graph in a colored graph.
 
+## Dependencies
+Currently the only dipendece is [PetGraph](https://github.com/bluss/petgraph) `v0.4.13`.
+
 ## Structure of the Repository
 
  - docs: Contains all the documents related to this package.
  - src: Source folder of the `.rs` files.
 
 
-## Author
- - [Elia Onofri](https://github.com/eOnofri04) - [Ln](https://www.linkedin.com/in/elia-onofri-80b403173/) (elia.onofri4@gmail.com)
+# Conclusion
 
-## Project Managers
- - [Flavio Lombardi](http://ricerca.mat.uniroma3.it/users/lombardi/)
+#### Author
+[Elia Onofri](https://github.com/eOnofri04) - [Ln](https://www.linkedin.com/in/elia-onofri-80b403173/) (elia.onofri4@gmail.com)
+
+#### Project Manager
+[Flavio Lombardi](http://ricerca.mat.uniroma3.it/users/lombardi/)
  
-## Bibliography Link
+# Bibliography Links
+
  - [Rust Language](https://www.rust-lang.org);
  - [Rust Manual](https://doc.rust-lang.org/book/);
  - [Graph Library Sample](https://github.com/bluss/petgraph);
