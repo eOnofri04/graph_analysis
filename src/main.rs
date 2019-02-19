@@ -3,6 +3,8 @@
 //use petgraph::stable_graph::*;
 mod geo_graph;
 pub use geo_graph::*;
+mod data_graph;
+pub use data_graph::*;
 /*
 pub struct Node{
 	w : i32,            // weight
@@ -41,7 +43,13 @@ fn edge_info(g:&StableGraph<&(i32, i32), &(i32, i32)>, e:&EdgeIndex) {
 fn main() {
 	println!("Hello, world!");
 	let mut deps = GeoGraph::new();
-	deps.add_node(&(2., 1., 3.));
+	let a = deps.add_node(2., 1., 3.);
+	let b = deps.add_node(2., 1., 2.);
+	deps.node_info(&a);
+	let e = deps.add_edge(&a, &b, 1);
+	deps.edge_info(&e);
+	
+	
 }
 
 /*
