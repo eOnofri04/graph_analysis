@@ -1,7 +1,8 @@
-extern crate petgraph;
+//extern crate petgraph;
 
-use petgraph::stable_graph::*;
-
+//use petgraph::stable_graph::*;
+mod geo_graph;
+pub use geo_graph::*;
 /*
 pub struct Node{
 	w : i32,            // weight
@@ -18,8 +19,7 @@ impl Node {
 }
 */
 
-
-
+/*
 fn node_info(graph:&StableGraph<&(i32, i32), &(i32, i32)>, node:&NodeIndex) {
 	let node_data = graph.node_weight(*node);	
 	match node_data{
@@ -35,11 +35,19 @@ fn edge_info(g:&StableGraph<&(i32, i32), &(i32, i32)>, e:&EdgeIndex) {
 		None    => println!("ERROR: {:?} do not belong to the Graph.", edge),
 	}
 }
-
+*/
 
 
 fn main() {
+	println!("Hello, world!");
+	let mut deps = GeoGraph::new();
+	deps.add_node(&(2., 1., 3.));
+}
+
+/*
+fn main() {
     println!("Hello, world!");
+
 	let mut deps = StableGraph::<&(i32, i32), &(i32, i32)>::new();
 	let A = deps.add_node(&(1, 2));
 	let B = deps.add_node(&(1, 1));
@@ -58,6 +66,7 @@ fn main() {
     	(c, d, (1, 1)), (c, e, (1, 1)), (d, e, (1, 1)),
 	]);
 */	
+	
 	deps.remove_node(A);
 //	println!("{:?}", deps);
 
@@ -65,4 +74,7 @@ fn main() {
 	node_info(&deps, &A);
 	node_info(&deps, &B);
 	edge_info(&deps, &c);
+
+
 }
+*/
