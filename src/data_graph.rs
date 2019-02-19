@@ -9,7 +9,7 @@ use data_graph::petgraph::stable_graph::*;
 
 pub use data_graph::petgraph::graph::*;
 
-
+#[derive(Debug)]
 pub struct DataGraph{
 	graph : StableGraph<(i32, i32), i32>,
 }

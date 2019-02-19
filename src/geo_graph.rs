@@ -1,5 +1,7 @@
 extern crate petgraph;
 
+use std::collections::HashMap;
+
 use geo_graph::petgraph::stable_graph::*;
 
 //use geo_graph::petgraph::*;
@@ -11,7 +13,7 @@ pub use geo_graph::petgraph::graph::*;
 
 pub use data_graph::*;
 
-
+#[derive(Debug)]
 pub struct GeoGraph{
 	graph : StableGraph<(f64, f64, f64), i32>,
 }
@@ -51,21 +53,26 @@ impl GeoGraph {
 		}
 	}
 	
-	pub fn line_graph(&self) {
-		let dg = DataGraph::new();
-		let n = self.graph.edge_count();
-		println!("{:?}", n);
-		let mut edge_table: [(EdgeIndex, NodeIndex); n];
-/*		let mut i = 0;
+	pub fn line_graph(&self) -> DataGraph {
+		let mut dg = DataGraph::new();
+		let mut edge_table : HashMap<EdgeIndex, NodeIndex> = HashMap::new();
 		for edge in self.graph.edge_indices() {
 			let edge_data = self.graph.edge_weight(edge);
 			match edge_data{
 				Some(x) => {
-					edge_table[i] = (edge, dg.add_node(*x));
-					i = i + 1;
+					edge_table.insert(edge, dg.add_node(*x));
 				},
 				None    => println!("ERROR: Something unexpected occurred while converting {:?}", edge),
 			}
-		}*/
+		}
+		for node in self.graph.node_indices() {
+			let mut to_add : Vec<NodeIndex> = Vec::new();
+			for edge in self.graph.edges(node) {
+				
+			}
+		}
+		println!("{:#?}", dg);
+		println!("{:#?}", edge_table);
+		dg
 	}
 }
