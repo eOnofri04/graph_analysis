@@ -48,6 +48,7 @@ fn main() {
 	deps.node_info(&a);
 	let e = deps.add_edge(&a, &b, 1);
 	deps.edge_info(&e);
+	deps.line_graph();
 	
 	
 }

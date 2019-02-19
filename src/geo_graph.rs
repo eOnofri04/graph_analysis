@@ -9,6 +9,8 @@ use geo_graph::petgraph::stable_graph::*;
 
 pub use geo_graph::petgraph::graph::*;
 
+pub use data_graph::*;
+
 
 pub struct GeoGraph{
 	graph : StableGraph<(f64, f64, f64), i32>,
@@ -33,7 +35,7 @@ impl GeoGraph {
 		self.graph.add_edge(*a, *b, color)
 	}
 	
-	pub fn node_info(& self, node:&NodeIndex) {
+	pub fn node_info(&self, node:&NodeIndex) {
 		let node_data = self.graph.node_weight(*node);	
 		match node_data{
 			Some(x) => println!("{:?} has x = {}, y = {} and z = {}", node, x.0, x.1, x.2),
@@ -41,11 +43,29 @@ impl GeoGraph {
 		}
 	}
 	
-	pub fn edge_info(& self, edge:&EdgeIndex) {
-		let edge_data = self.graph.edge_weight(*edge);	
+	pub fn edge_info(&self, edge:&EdgeIndex) {
+		let edge_data = self.graph.edge_weight(*edge);
 		match edge_data{
 			Some(x) => println!("{:?} has color = {}", edge, x),
 			None    => println!("ERROR: {:?} do not belong to the Graph.", edge),
 		}
+	}
+	
+	pub fn line_graph(&self) {
+		let dg = DataGraph::new();
+		let n = self.graph.edge_count();
+		println!("{:?}", n);
+		let mut edge_table: [(EdgeIndex, NodeIndex); n];
+/*		let mut i = 0;
+		for edge in self.graph.edge_indices() {
+			let edge_data = self.graph.edge_weight(edge);
+			match edge_data{
+				Some(x) => {
+					edge_table[i] = (edge, dg.add_node(*x));
+					i = i + 1;
+				},
+				None    => println!("ERROR: Something unexpected occurred while converting {:?}", edge),
+			}
+		}*/
 	}
 }

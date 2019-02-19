@@ -21,11 +21,11 @@ impl DataGraph {
 		}
 	}
 	
-	fn add_node(&mut self, color : i32) -> NodeIndex<DefaultIx> {
+	pub fn add_node(&mut self, color : i32) -> NodeIndex<DefaultIx> {
 		self.graph.add_node((color, 1))
 	}
 	
-	fn add_edge(&mut self, a : &NodeIndex<DefaultIx>, b : &NodeIndex<DefaultIx>) -> EdgeIndex<DefaultIx> {
+	pub fn add_edge(&mut self, a : &NodeIndex<DefaultIx>, b : &NodeIndex<DefaultIx>) -> EdgeIndex<DefaultIx> {
 		self.graph.add_edge(*a, *b, 1)
 	}
 	
