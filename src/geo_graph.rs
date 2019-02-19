@@ -4,6 +4,8 @@ use std::collections::HashMap;
 
 use geo_graph::petgraph::stable_graph::*;
 
+use geo_graph::petgraph::Direction::*;
+
 //use geo_graph::petgraph::*;
 
 //use geo_graph::petgraph::prelude::*;
@@ -58,17 +60,31 @@ impl GeoGraph {
 		let mut edge_table : HashMap<EdgeIndex, NodeIndex> = HashMap::new();
 		for edge in self.graph.edge_indices() {
 			let edge_data = self.graph.edge_weight(edge);
-			match edge_data{
+			match edge_data {
 				Some(x) => {
 					edge_table.insert(edge, dg.add_node(*x));
 				},
-				None    => println!("ERROR: Something unexpected occurred while converting {:?}", edge),
+				None    => println!("ERROR: Something unexpected occurred while converting {:?}.", edge),
 			}
 		}
 		for node in self.graph.node_indices() {
 			let mut to_add : Vec<NodeIndex> = Vec::new();
-			for edge in self.graph.edges(node) {
-				
+			for edge in self.graph.edges_directed(node, Outgoing) {
+				println!("{:?}, {:?}",node, edge);
+//				match edge_table.get(edge) {
+//        			Some(x)	=> {
+//						to_add.push(*x);
+//					},
+//        			None	=> println!("ERROR: Something unexpected occurred while looking for {:?}.", edge)
+//    			}
+			}
+			for edge in self.graph.edges_directed(node, Incoming) {
+//				match edge_table.get(edge) {
+//        			Some(x)	=> {
+//						to_add.push(*x);
+//					},
+//        			None	=> println!("ERROR: Something unexpected occurred while looking for {:?}.", edge)
+//    			}
 			}
 		}
 		println!("{:#?}", dg);
