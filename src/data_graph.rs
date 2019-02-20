@@ -26,7 +26,7 @@ impl DataGraph {
 	}
 	
 	pub fn add_edge(&mut self, a : &NodeIndex<DefaultIx>, b : &NodeIndex<DefaultIx>) -> EdgeIndex<DefaultIx> {
-		self.graph.add_edge(*a, *b, 1)
+		self.graph.update_edge(*a, *b, 1)
 	}
 	
 	pub fn node_info(& self, node:&NodeIndex) {

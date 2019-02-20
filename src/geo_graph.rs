@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use geo_graph::petgraph::stable_graph::*;
 
-use geo_graph::petgraph::Direction::*;
+//use geo_graph::petgraph::Direction::*;
 
 //use geo_graph::petgraph::*;
 
@@ -36,7 +36,7 @@ impl GeoGraph {
 	}
 	
 	pub fn add_edge(&mut self, a : &NodeIndex<DefaultIx>, b : &NodeIndex<DefaultIx>, color : i32) -> EdgeIndex<DefaultIx> {
-		self.graph.add_edge(*a, *b, color)
+		self.graph.update_edge(*a, *b, color)
 	}
 	
 	pub fn node_info(&self, node:&NodeIndex) {
@@ -67,24 +67,37 @@ impl GeoGraph {
 				None    => println!("ERROR: Something unexpected occurred while converting {:?}.", edge),
 			}
 		}
-		for node in self.graph.node_indices() {
-			let mut to_add : Vec<NodeIndex> = Vec::new();
-			for edge in self.graph.edges_directed(node, Outgoing) {
-				println!("{:?}, {:?}",node, edge);
-//				match edge_table.get(edge) {
-//        			Some(x)	=> {
-//						to_add.push(*x);
-//					},
-//        			None	=> println!("ERROR: Something unexpected occurred while looking for {:?}.", edge)
-//    			}
-			}
-			for edge in self.graph.edges_directed(node, Incoming) {
-//				match edge_table.get(edge) {
-//        			Some(x)	=> {
-//						to_add.push(*x);
-//					},
-//        			None	=> println!("ERROR: Something unexpected occurred while looking for {:?}.", edge)
-//    			}
+		for edge1 in self.graph.edge_indices() {
+			match self.graph.edge_endpoints(edge1) {
+				Some(x) => {
+					let a1 = x.0;
+					let b1 = x.1;
+					for edge2 in self.graph.edge_indices() {
+						if edge1 != edge2{
+							match self.graph.edge_endpoints(edge2) {
+								Some(y) => {
+									let a2 = y.0;
+									let b2 = y.1;
+									if (a1 == a2) || (a1 == b2) || (b1 == a2) || (b1 == b2){
+										match edge_table.get(&edge1) {
+											Some(e) => {
+												match edge_table.get(&edge2) {
+													Some(f) => {
+														dg.add_edge(&e, &f);
+													},
+													None   => println!("ERROR: Something unexpected occurred while looking for {:?} in the lookup table.", edge2)
+												}
+											},
+											None   => println!("ERROR: Something unexpected occurred while looking for {:?} in the lookup table.", edge2)
+										}
+									}
+								},
+								None   => println!("ERROR: Something unexpected occurred while looking for {:?} endpoints.", edge2)
+							}
+						}
+					}
+				},
+				None   => println!("ERROR: Something unexpected occurred while looking for {:?} endpoints.", edge1)
 			}
 		}
 		println!("{:#?}", dg);
