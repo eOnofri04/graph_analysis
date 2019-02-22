@@ -53,7 +53,8 @@ fn main() {
 	deps.add_edge(&b, &c, 1);
 	deps.add_edge(&a, &c, 2);
 	deps.edge_info(&e);
-	//deps.line_graph();
+	let lg = GeoGraph::<i32, i32>::line_graph(deps);
+	println!("{:#?}", lg);
 }
 
 	
