@@ -1,6 +1,8 @@
 //extern crate petgraph;
 
 //use petgraph::stable_graph::*;
+
+
 mod geo_graph;
 pub use geo_graph::*;
 mod data_graph;
@@ -22,7 +24,7 @@ impl Node {
 */
 
 /*
-fn node_info(graph:&StableGraph<&(i32, i32), &(i32, i32)>, node:&NodeIndex) {
+fn node_info(graph:&StableGraph<&(i32, i32), &(i32, i32), Undirected>, node:&NodeIndex) {
 	let node_data = graph.node_weight(*node);	
 	match node_data{
 		Some(x) => println!("{:?} has weight = {} and color = {}", node, x.0, x.1),
@@ -30,7 +32,7 @@ fn node_info(graph:&StableGraph<&(i32, i32), &(i32, i32)>, node:&NodeIndex) {
 	}
 }
 
-fn edge_info(g:&StableGraph<&(i32, i32), &(i32, i32)>, e:&EdgeIndex) {
+fn edge_info(g:&StableGraph<&(i32, i32), &(i32, i32), Undirected>, e:&EdgeIndex) {
 	let edge = g.edge_weight(*e);	
 	match edge{
 		Some(x) => println!("{:?} has weight = {} and color = {}", e, x.0, x.1),
@@ -42,25 +44,26 @@ fn edge_info(g:&StableGraph<&(i32, i32), &(i32, i32)>, e:&EdgeIndex) {
 
 fn main() {
 	println!("Hello, world!");
-	let mut deps = GeoGraph::new();
-	let a = deps.add_node(2., 1., 3.);
-	let b = deps.add_node(2., 1., 2.);
-	let c = deps.add_node(2., 2., 3.);
+	let mut deps = GeoGraph::<(f64, f64, f64), i32>::new();
+	let a = deps.add_node((2., 1., 3.));
+	let b = deps.add_node((2., 1., 2.));
+	let c = deps.add_node((2., 2., 3.));
 	deps.node_info(&a);
 	let e = deps.add_edge(&a, &b, 1);
 	deps.add_edge(&b, &c, 1);
 	deps.add_edge(&a, &c, 2);
 	deps.edge_info(&e);
-	deps.line_graph();
-	
-	
+	//deps.line_graph();
 }
+
+	
+
 
 /*
 fn main() {
     println!("Hello, world!");
 
-	let mut deps = StableGraph::<&(i32, i32), &(i32, i32)>::new();
+	let mut deps = StableGraph::<&(i32, i32), &(i32, i32), Undirected>::with_capacity(0, 0);
 	let A = deps.add_node(&(1, 2));
 	let B = deps.add_node(&(1, 1));
 	let C = deps.add_node(&(1, 3));
