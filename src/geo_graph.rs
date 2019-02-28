@@ -50,7 +50,7 @@ impl<V, E> GeoGraph<V, E, Undirected>
 		}
 	}
 
-	pub fn line_graph<W>(from : GeoGraph<W, V, Undirected>) -> Self 
+	pub fn line_graph<W>(from : &mut GeoGraph<W, V, Undirected>) -> Self 
 		where	W	:	std::fmt::Debug,
 	{
 		let mut dg = GeoGraph::<V, E, Undirected>::new();
@@ -59,6 +59,7 @@ impl<V, E> GeoGraph<V, E, Undirected>
 			let edge_data = from.graph.edge_weight(edge);
 			match edge_data {
 				Some(x) => {
+					println!("ERROR: Something unexpected occurred while converting {:?}.", *x);
 					edge_table.insert(edge, dg.add_node(*x));
 				},
 				None    => println!("ERROR: Something unexpected occurred while converting {:?}.", edge),
