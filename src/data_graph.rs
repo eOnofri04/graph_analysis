@@ -9,7 +9,7 @@ use data_graph::petgraph::stable_graph::*;
 
 pub use data_graph::petgraph::graph::*;
 
-
+#[derive(Debug)]
 pub struct DataGraph{
 	graph : StableGraph<(i32, i32), i32>,
 }
@@ -21,12 +21,12 @@ impl DataGraph {
 		}
 	}
 	
-	fn add_node(&mut self, color : i32) -> NodeIndex<DefaultIx> {
+	pub fn add_node(&mut self, color : i32) -> NodeIndex<DefaultIx> {
 		self.graph.add_node((color, 1))
 	}
 	
-	fn add_edge(&mut self, a : &NodeIndex<DefaultIx>, b : &NodeIndex<DefaultIx>) -> EdgeIndex<DefaultIx> {
-		self.graph.add_edge(*a, *b, 1)
+	pub fn add_edge(&mut self, a : &NodeIndex<DefaultIx>, b : &NodeIndex<DefaultIx>) -> EdgeIndex<DefaultIx> {
+		self.graph.update_edge(*a, *b, 1)
 	}
 	
 	pub fn node_info(& self, node:&NodeIndex) {
