@@ -1,5 +1,8 @@
 extern crate petgraph;
 
+mod colourable;
+pub use self::colourable::*;
+
 use std::collections::HashMap;
 use std::fmt;
 
@@ -16,12 +19,14 @@ use self::petgraph::Directed;
 
 pub use geo_graph::petgraph::graph::*;
 
-pub use data_graph::*;
+//pub use data_graph::*;
 
 
+//***********************************************
 //
 //	GEOGRAPH STRUC DEFINITION
 //
+//***********************************************
 
 #[derive(Debug)]
 pub struct GeoGraph<V, E, Ty = Undirected, Ix = DefaultIx>
@@ -36,9 +41,11 @@ pub struct GeoGraph<V, E, Ty = Undirected, Ix = DefaultIx>
 pub type GeoDiGraph<N, E, Ix = DefaultIx> = GeoGraph<N, E, Directed, Ix>;
 
 
+//***********************************************
 //
 //	IMPLEMENTATION FOR UNDIRECTED GEOGRAPH
 //
+//***********************************************
 
 impl<V, E> GeoGraph<V, E, Undirected> 
 	where	V	: std::fmt::Debug,
@@ -61,8 +68,7 @@ impl<V, E> GeoGraph<V, E, Undirected>
 			let edge_data = from.graph.edge_weight(edge);
 			match edge_data {
 				Some(x) => {
-					let v = (*x).clone();
-					edge_table.insert(edge, dg.add_node(v));
+					edge_table.insert(edge, dg.add_node((*x).clone()));
 				},
 				None    => println!("ERROR: Something unexpected occurred while converting {:?}.", edge),
 			}
@@ -70,15 +76,15 @@ impl<V, E> GeoGraph<V, E, Undirected>
 		for edge1 in from.graph.edge_indices() {
 			match from.graph.edge_endpoints(edge1) {
 				Some(x) => {
-					let a1 = x.0;
-					let b1 = x.1;
+					let src1 = x.0;
+					let dst1 = x.1;
 					for edge2 in from.graph.edge_indices() {
 						if edge1 != edge2{
 							match from.graph.edge_endpoints(edge2) {
 								Some(y) => {
-									let a2 = y.0;
-									let b2 = y.1;
-									if (a1 == a2) || (a1 == b2) || (b1 == a2) || (b1 == b2){
+									let src2 = y.0;
+									let dst2 = y.1;
+									if (src1 == src2) || (src1 == dst2) || (dst1 == src2) || (dst1 == dst2){
 										match edge_table.get(&edge1) {
 											Some(e) => {
 												match edge_table.get(&edge2) {
@@ -100,43 +106,75 @@ impl<V, E> GeoGraph<V, E, Undirected>
 				None   => println!("ERROR: Something unexpected occurred while looking for {:?} endpoints.", edge1)
 			}
 		}
-		//println!("{:#?}", dg);
-		//println!("{:#?}", edge_table);
 		dg
 	}
 }
 
 
-	/*	
-	pub fn line_graph(&self) -> DataGraph {
-		let mut dg = DataGraph::new();
+//***********************************************
+//
+//	IMPLEMENTATION FOR DIRECTED GEOGRAPH
+//
+//***********************************************
+
+impl<V, E> GeoGraph<V, E, Directed> 
+	where	V : std::fmt::Debug,
+			E : std::fmt::Debug,
+{	
+	pub fn new() -> Self {
+		GeoGraph::<V, E, Directed>{
+			graph : StableGraph::<V, E, Directed>::with_capacity(0, 0),
+		}
+	}
+
+	pub fn line_graph<W>(from : &GeoGraph<W, V, Undirected>, default : E) -> Self 
+		where	W	:	std::fmt::Debug,
+				V	:	std::clone::Clone,
+				E	:	std::clone::Clone,
+	{
+		let mut dg = GeoGraph::<V, E, Directed>::new();
 		let mut edge_table : HashMap<EdgeIndex, NodeIndex> = HashMap::new();
-		for edge in self.graph.edge_indices() {
-			let edge_data = self.graph.edge_weight(edge);
+		for edge in from.graph.edge_indices() {
+			let edge_data = from.graph.edge_weight(edge);
 			match edge_data {
 				Some(x) => {
-					edge_table.insert(edge, dg.add_node(*x));
+					edge_table.insert(edge, dg.add_node((*x).clone()));
 				},
 				None    => println!("ERROR: Something unexpected occurred while converting {:?}.", edge),
 			}
 		}
-		for edge1 in self.graph.edge_indices() {
-			match self.graph.edge_endpoints(edge1) {
+		for edge1 in from.graph.edge_indices() {
+			match from.graph.edge_endpoints(edge1) {
 				Some(x) => {
-					let a1 = x.0;
-					let b1 = x.1;
-					for edge2 in self.graph.edge_indices() {
+					let src1 = x.0;
+					let dst1 = x.1;
+					for edge2 in from.graph.edge_indices() {
 						if edge1 != edge2{
-							match self.graph.edge_endpoints(edge2) {
+							match from.graph.edge_endpoints(edge2) {
 								Some(y) => {
-									let a2 = y.0;
-									let b2 = y.1;
-									if (a1 == a2) || (a1 == b2) || (b1 == a2) || (b1 == b2){
+									let src2 = y.0;
+									let dst2 = y.1;
+									
+									if (dst1 == src2){
 										match edge_table.get(&edge1) {
 											Some(e) => {
 												match edge_table.get(&edge2) {
 													Some(f) => {
-														dg.add_edge(&e, &f);
+														dg.add_edge(&e, &f, default.clone());
+													},
+													None   => println!("ERROR: Something unexpected occurred while looking for {:?} in the lookup table.", edge2)
+												}
+											},
+											None   => println!("ERROR: Something unexpected occurred while looking for {:?} in the lookup table.", edge2)
+										}
+									}
+
+									if (dst2 == src1){
+										match edge_table.get(&edge1) {
+											Some(e) => {
+												match edge_table.get(&edge2) {
+													Some(f) => {
+														dg.add_edge(&f, &e, default.clone());
 													},
 													None   => println!("ERROR: Something unexpected occurred while looking for {:?} in the lookup table.", edge2)
 												}
@@ -153,32 +191,16 @@ impl<V, E> GeoGraph<V, E, Undirected>
 				None   => println!("ERROR: Something unexpected occurred while looking for {:?} endpoints.", edge1)
 			}
 		}
-		println!("{:#?}", dg);
-		println!("{:#?}", edge_table);
 		dg
-	}*/
-
-
-
-//
-//	IMPLEMENTATION FOR DIRECTED GEOGRAPH
-//
-
-impl<V, E> GeoGraph<V, E, Directed> 
-	where	V : std::fmt::Debug,
-			E : std::fmt::Debug,
-{	
-	pub fn new() -> Self {
-		GeoGraph::<V, E, Directed>{
-			graph : StableGraph::<V, E, Directed>::with_capacity(0, 0),
-		}
 	}
 }
 
 
+//***********************************************
 //
 //	IMPLEMENTATION FOR GENERIC GEOGRAPH
 //
+//***********************************************
 
 impl<V, E> GeoGraph<V, E>
 	where	V : std::fmt::Debug,
@@ -210,5 +232,26 @@ impl<V, E> GeoGraph<V, E>
 			Some(x) => println!("{:?} has {:#?}", edge, x),
 			None    => println!("ERROR: {:?} do not belong to the Graph.", edge),
 		}
+	}
+}
+
+
+//***********************************************
+//
+//	IMPLEMENTATION FOR COLOURED GEOGRAPH
+//
+//***********************************************
+
+impl<V, E> GeoGraph<V, E>
+	where	V	:	std::fmt::Debug,
+			V	:	colourable::classifyAs,
+			E	:	std::fmt::Debug,
+{
+//	pub fn add_node(&mut self, p : (f64, f64, f64)) -> NodeIndex<DefaultIx> {
+//		self.graph.add_node(p)
+//	}
+	
+	pub fn color_contraction(&mut self) -> Self {
+		self
 	}
 }
