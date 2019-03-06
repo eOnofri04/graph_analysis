@@ -275,9 +275,11 @@ impl<V, E> GeoGraph<V, E>
 
 	/// It contract the graph over a colour given in input.
 	///
-	/// Firstly it builds an Hash Set made of the vertex with the colour
-	/// given in input.
-	/// Then it uses this set in order to contract adiacent vertex.
+	/// Firstly it builds an Vec made of the vertex with the colour
+	/// given in input. (Maybe HashSet?)
+	/// Then it uses this Vec in order to contract adiacent vertex.
+	/// If a new node has been built the iteration starts over
+	/// in order to fullfill the problem with updating mutable iterators.
 
 	pub fn class_contraction(&mut self, class : i32) {
 		let mut class_vec = Vec::new();
@@ -293,28 +295,71 @@ impl<V, E> GeoGraph<V, E>
 			}
 		}
 
-		let mut iter1 = class_vec.iter();
-		loop {
-			let idx1;
-			match iter1.next() {
-				Some(x)	=> idx1 = *x,
-                None	=> break,
-			}
-			let mut iter2 = iter1.clone();
-			loop {
-				let idx2;
-				match iter2.next() {
-					Some(x)	=> idx2 = *x,
+		let mut flag = true;
+		
+		while flag {
+			let class_vec_clone = class_vec.clone();
+			let mut iter1 = class_vec_clone.iter();
+			flag = false;
+			loop{
+				let idx1;
+				match iter1.next() {
+					Some(x)	=> idx1 = *x,
 					None	=> break,
 				}
-				if self.are_neighbors(idx1, idx2) {
-					self.add_node(V::default_classifiable_node(class));
-					//add edges
-					self.remove_node(idx1);
-					self.remove_node(idx2);
+				let mut iter2 = iter1.clone();
+				loop {
+					let idx2;
+					match iter2.next() {
+						Some(x)	=> idx2 = *x,
+						None	=> break,
+					}
+					if self.are_neighbors(idx1, idx2) {
+						flag = true;
+						let new_idx = self.add_node(V::default_classifiable_node(class));
+						//! TO DO
+						//add edges
+						self.remove_node(idx1);
+						self.remove_node(idx2);
+						class_vec.remove_item(&idx1);
+						class_vec.remove_item(&idx2);
+						class_vec.push(new_idx);
+						break;
+					}
+				}
+				if flag {
+					break;
 				}
 			}
+			
 		}
+
+		// let mut iter1 = class_vec.iter();
+		// loop {
+		// 	let idx1;
+		// 	match iter1.next() {
+		// 		Some(x)	=> idx1 = *x,
+		//		None	=> break,
+		// 	}
+		// 	let mut iter2 = iter1.clone();
+		// 	loop {
+		// 		let idx2;
+		// 		match iter2.next() {
+		// 			Some(x)	=> idx2 = *x,
+		// 			None	=> break,
+		// 		}
+		// 		if self.are_neighbors(idx1, idx2) {
+		// 			let new_idx = self.add_node(V::default_classifiable_node(class));
+		// 			//add edges
+		// 			self.remove_node(idx1);
+		// 			self.remove_node(idx2);
+		// 			// They Should Be Removed
+		// 			//class_vec.remove_item(&idx1);
+		// 			//class_vec.remove_item(&idx2);
+		// 			//class_vec.push(new_idx);
+		// 		}
+		// 	}
+		// }
 
 		println!("The following nodes have colour = {}: {:#?}", class, class_vec);
 	}
