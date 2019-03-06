@@ -155,7 +155,7 @@ impl<V, E> GeoGraph<V, E, Directed>
 									let src2 = y.0;
 									let dst2 = y.1;
 									
-									if (dst1 == src2){
+									if dst1 == src2{
 										match edge_table.get(&edge1) {
 											Some(e) => {
 												match edge_table.get(&edge2) {
@@ -169,7 +169,7 @@ impl<V, E> GeoGraph<V, E, Directed>
 										}
 									}
 
-									if (dst2 == src1){
+									if dst2 == src1{
 										match edge_table.get(&edge1) {
 											Some(e) => {
 												match edge_table.get(&edge2) {
@@ -202,9 +202,10 @@ impl<V, E> GeoGraph<V, E, Directed>
 //
 //***********************************************
 
-impl<V, E> GeoGraph<V, E>
-	where	V : std::fmt::Debug,
-			E : std::fmt::Debug,
+impl<V, E, Ty> GeoGraph<V, E, Ty>
+	where	V	: std::fmt::Debug,
+			E	: std::fmt::Debug,
+			Ty	: petgraph::EdgeType,
 {
 //	pub fn add_node(&mut self, p : (f64, f64, f64)) -> NodeIndex<DefaultIx> {
 //		self.graph.add_node(p)
@@ -242,16 +243,17 @@ impl<V, E> GeoGraph<V, E>
 //
 //***********************************************
 
+
 impl<V, E> GeoGraph<V, E>
 	where	V	:	std::fmt::Debug,
-			V	:	colourable::classifyAs,
+			V	:	colourable::Colourable,
 			E	:	std::fmt::Debug,
 {
 //	pub fn add_node(&mut self, p : (f64, f64, f64)) -> NodeIndex<DefaultIx> {
 //		self.graph.add_node(p)
 //	}
 	
-	pub fn color_contraction(&mut self) -> Self {
-		self
+	pub fn color_contraction(&mut self) {
+		
 	}
 }

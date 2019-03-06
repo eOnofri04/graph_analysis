@@ -1,9 +1,9 @@
-trait colourable{
-	fn classifyAs(&self) -> i32;
+pub trait Colourable{
+	fn classify_as(&self) -> i32;
 }
 
-impl colourable for i32 {
-	fn classifyAs(&self) -> i32{
-		self
+impl Colourable for i32 {
+	fn classify_as(&self) -> i32{
+		*self
 	}
 }
