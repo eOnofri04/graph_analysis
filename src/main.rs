@@ -56,8 +56,9 @@ fn main() {
 	deps.add_edge(&a, &c, 2);
 	deps.add_edge(&b, &d, 3);
 	//deps.edge_info(&e);
-	let lg = GeoGraph::<i32, i32>::line_graph(&mut deps, 0);
-	println!("{:#?}", lg);
+	let mut lg = GeoGraph::<i32, i32>::line_graph(&mut deps, 0);
+	//println!("{:#?}", lg);
+	lg.class_contraction(1);
 }
 
 	

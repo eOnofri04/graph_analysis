@@ -1,9 +1,10 @@
 extern crate petgraph;
 
-mod colourable;
-pub use self::colourable::*;
+mod classifiable;
+pub use self::classifiable::*;
 
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::fmt;
 
 use self::petgraph::stable_graph::*;
@@ -214,6 +215,24 @@ impl<V, E, Ty> GeoGraph<V, E, Ty>
 	pub fn add_node(&mut self, node : V) -> NodeIndex<DefaultIx> {
 		self.graph.add_node(node)
 	}
+
+	pub fn get_node(&self, node_idx : NodeIndex) -> Option<&V> {
+		self.graph.node_weight(node_idx)
+	}
+
+	pub fn remove_node(&mut self, node_idx : NodeIndex) -> Option<V> {
+		self.graph.remove_node(node_idx)
+	}
+
+	pub fn are_neighbors(&self, node1_idx : NodeIndex, node2_idx : NodeIndex) -> bool {
+		let is_there = self.graph.find_edge_undirected(node1_idx, node2_idx);
+		let ret : bool;
+		match is_there{
+			Some(_x)	=> ret = true,
+			None		=> ret = false,	
+		}
+		ret
+	}
 	
 	pub fn add_edge(&mut self, a : &NodeIndex<DefaultIx>, b : &NodeIndex<DefaultIx>, edge : E) -> EdgeIndex<DefaultIx> {
 		self.graph.update_edge(*a, *b, edge)
@@ -246,14 +265,43 @@ impl<V, E, Ty> GeoGraph<V, E, Ty>
 
 impl<V, E> GeoGraph<V, E>
 	where	V	:	std::fmt::Debug,
-			V	:	colourable::Colourable,
+			V	:	classifiable::Classifiable,
 			E	:	std::fmt::Debug,
 {
 //	pub fn add_node(&mut self, p : (f64, f64, f64)) -> NodeIndex<DefaultIx> {
 //		self.graph.add_node(p)
 //	}
 	
-	pub fn color_contraction(&mut self) {
-		
+
+	/// It contract the graph over a colour given in input.
+	///
+	/// Firstly it builds an Hash Set made of the vertex with the colour
+	/// given in input.
+	/// Then it uses this set in order to contract adiacent vertex.
+
+	pub fn class_contraction(&mut self, class : i32) {
+		let mut class_set = HashSet::new();
+		for node_index in self.graph.node_indices() {
+			let node = self.get_node(node_index);
+			match node{
+				Some(x)	=> {
+					if x.classify_as() == class {
+						class_set.insert(node_index);
+					}
+				},
+				None	=> println!("ERROR: while classifying {:?}.", node),
+			}
+		}
+		for idx1 in class_set {
+			for idx2 in class_set{
+				if self.are_neighbors(idx1, idx2) {
+					self.add_node(V::default_classifiable_node(class));
+					//add edges
+					self.remove_node(idx1);
+					self.remove_node(idx2);
+				}
+			}
+		}
+		//println!("The following nodes have colour = {}: {:#?}", class, class_set);
 	}
 }
