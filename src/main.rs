@@ -59,6 +59,7 @@ fn main() {
 	let mut lg = GeoGraph::<i32, i32>::line_graph(&mut deps, 0);
 	//println!("{:#?}", lg);
 	lg.class_contraction(1);
+	println!("{:#?}", lg);
 }
 
 	

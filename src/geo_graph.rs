@@ -280,20 +280,33 @@ impl<V, E> GeoGraph<V, E>
 	/// Then it uses this set in order to contract adiacent vertex.
 
 	pub fn class_contraction(&mut self, class : i32) {
-		let mut class_set = HashSet::new();
+		let mut class_vec = Vec::new();
 		for node_index in self.graph.node_indices() {
 			let node = self.get_node(node_index);
 			match node{
 				Some(x)	=> {
 					if x.classify_as() == class {
-						class_set.insert(node_index);
+						class_vec.push(node_index);
 					}
 				},
 				None	=> println!("ERROR: while classifying {:?}.", node),
 			}
 		}
-		for idx1 in class_set {
-			for idx2 in class_set{
+
+		let mut iter1 = class_vec.iter();
+		loop {
+			let idx1;
+			match iter1.next() {
+				Some(x)	=> idx1 = *x,
+                None	=> break,
+			}
+			let mut iter2 = iter1.clone();
+			loop {
+				let idx2;
+				match iter2.next() {
+					Some(x)	=> idx2 = *x,
+					None	=> break,
+				}
 				if self.are_neighbors(idx1, idx2) {
 					self.add_node(V::default_classifiable_node(class));
 					//add edges
@@ -302,6 +315,7 @@ impl<V, E> GeoGraph<V, E>
 				}
 			}
 		}
-		//println!("The following nodes have colour = {}: {:#?}", class, class_set);
+
+		println!("The following nodes have colour = {}: {:#?}", class, class_vec);
 	}
 }
