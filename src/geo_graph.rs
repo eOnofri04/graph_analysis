@@ -296,6 +296,7 @@ impl<V, E> GeoGraph<V, E>
 	/// in order to fullfill the problem with updating mutable iterators.
 
 	pub fn class_contraction(&mut self, class : i32) -> bool {
+		let DEBUG = true;
 		let mut theres_work = false;
 		let mut class_vec = Vec::new();
 		for node_index in self.graph.node_indices() {
@@ -333,6 +334,9 @@ impl<V, E> GeoGraph<V, E>
 						flag = true;
 						theres_work = true;
 						let new_idx = self.add_node(V::default_classifiable_node(class));
+						if DEBUG {
+							println!("\n\\\\ Contrapting nodes {:?} and {:?} into {:?}.", idx1, idx2, new_idx);
+						}
 						// ! TO DO
 						//add edges
 						let mut to_add = Vec::new();
@@ -349,7 +353,22 @@ impl<V, E> GeoGraph<V, E>
 								None	=> {;},
 							}
 						}
-						//print!("{:#?}", to_add);
+						for idxc in self.graph.neighbors_directed(idx2, Outgoing) {
+							match self.get_edge(&idx2, &idx1){
+								Some(x)	=> {
+									match self.get_edge(&idx2, &idxc){
+										Some(y)	=> {
+											to_add.push((new_idx, idxc, E::combine_elements(x, y)));
+										}
+										None => {;},
+									}
+								}
+								None	=> {;},
+							}
+						}
+						if DEBUG {
+							println!("\\\\ To add Edges : {:#?}", to_add);
+						}
 						for edge_data in to_add{
 							self.add_edge(&edge_data.0, &edge_data.1, edge_data.2);
 						}
