@@ -295,7 +295,8 @@ impl<V, E> GeoGraph<V, E>
 	/// If a new node has been built the iteration starts over
 	/// in order to fullfill the problem with updating mutable iterators.
 
-	pub fn class_contraction(&mut self, class : i32) {
+	pub fn class_contraction(&mut self, class : i32) -> bool {
+		let mut theres_work = false;
 		let mut class_vec = Vec::new();
 		for node_index in self.graph.node_indices() {
 			let node = self.get_node(node_index);
@@ -330,6 +331,7 @@ impl<V, E> GeoGraph<V, E>
 					}
 					if self.are_neighbors(idx1, idx2) {
 						flag = true;
+						theres_work = true;
 						let new_idx = self.add_node(V::default_classifiable_node(class));
 						// ! TO DO
 						//add edges
@@ -363,7 +365,6 @@ impl<V, E> GeoGraph<V, E>
 					break;
 				}
 			}
-			
 		}
 
 		// let mut iter1 = class_vec.iter();
@@ -394,18 +395,30 @@ impl<V, E> GeoGraph<V, E>
 		// }
 
 		println!("The following nodes have colour = {}: {:#?}", class, class_vec);
+		theres_work
 	}
 
 	pub fn contraction(&mut self) {
-		let mut class_set = HashSet::new();
-		for node_index in self.graph.node_indices(){
-			match self.get_node(node_index){
-				Some(x)	=> {class_set.insert(x.classify_as());},
-				None	=> {;},
+		let mut theres_work = true;
+		let mut i = 1;
+		
+		while (theres_work){
+			println!("\n==== ITERATION NUMBER {:?} ====\n\n", i);
+
+			let mut class_set = HashSet::new();
+
+			for node_index in self.graph.node_indices(){
+				match self.get_node(node_index){
+					Some(x)	=> {class_set.insert(x.classify_as());},
+					None	=> {;},
+				}
 			}
-		}
-		for class in class_set{
-			self.class_contraction(class);
+
+			theres_work = false;
+			for class in class_set{
+				theres_work = self.class_contraction(class) || theres_work;
+			}
+			i = i+1;
 		}
 	}
 }
