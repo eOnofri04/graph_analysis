@@ -1,7 +1,9 @@
 extern crate petgraph;
 
 mod classifiable;
+mod combinable;
 pub use self::classifiable::*;
+pub use self::combinable::*;
 
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -10,6 +12,8 @@ use std::fmt;
 use self::petgraph::stable_graph::*;
 use self::petgraph::Undirected;
 use self::petgraph::Directed;
+use geo_graph::petgraph::Direction::Outgoing;
+use geo_graph::petgraph::Direction::Incoming;
 
 //use geo_graph::petgraph::Direction::*;
 
@@ -29,7 +33,7 @@ pub use geo_graph::petgraph::graph::*;
 //
 //***********************************************
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GeoGraph<V, E, Ty = Undirected, Ix = DefaultIx>
 	where	V	: std::fmt::Debug,
 			E	: std::fmt::Debug,
@@ -237,6 +241,15 @@ impl<V, E, Ty> GeoGraph<V, E, Ty>
 	pub fn add_edge(&mut self, a : &NodeIndex<DefaultIx>, b : &NodeIndex<DefaultIx>, edge : E) -> EdgeIndex<DefaultIx> {
 		self.graph.update_edge(*a, *b, edge)
 	}
+
+	pub fn get_edge(&self, node1_idx : &NodeIndex, node2_idx : &NodeIndex) -> Option<&E> {
+		let ret :Option<&E>;
+		match self.graph.find_edge_undirected(*node1_idx, *node2_idx){
+			Some(x)	=> ret = self.graph.edge_weight(x.0),
+			None	=> ret = None,
+		}
+		ret
+	}
 	
 	pub fn node_info(&self, node:&NodeIndex) {
 		let node_data = self.graph.node_weight(*node);	
@@ -267,6 +280,7 @@ impl<V, E> GeoGraph<V, E>
 	where	V	:	std::fmt::Debug,
 			V	:	classifiable::Classifiable,
 			E	:	std::fmt::Debug,
+			E	:	combinable::Combinable<E>,
 {
 //	pub fn add_node(&mut self, p : (f64, f64, f64)) -> NodeIndex<DefaultIx> {
 //		self.graph.add_node(p)
@@ -317,12 +331,30 @@ impl<V, E> GeoGraph<V, E>
 					if self.are_neighbors(idx1, idx2) {
 						flag = true;
 						let new_idx = self.add_node(V::default_classifiable_node(class));
-						//! TO DO
+						// ! TO DO
 						//add edges
+						let mut to_add = Vec::new();
+						for idxc in self.graph.neighbors_directed(idx1, Outgoing) {
+							match self.get_edge(&idx1, &idx2){
+								Some(x)	=> {
+									match self.get_edge(&idx1, &idxc){
+										Some(y)	=> {
+											to_add.push((new_idx, idxc, E::combine_elements(x, y)));
+										}
+										None => {;},
+									}
+								}
+								None	=> {;},
+							}
+						}
+						//print!("{:#?}", to_add);
+						for edge_data in to_add{
+							self.add_edge(&edge_data.0, &edge_data.1, edge_data.2);
+						}
 						self.remove_node(idx1);
 						self.remove_node(idx2);
-						class_vec.remove_item(&idx1);
-						class_vec.remove_item(&idx2);
+						//class_vec.remove_item(&idx1);
+						//class_vec.remove_item(&idx2);
 						class_vec.push(new_idx);
 						break;
 					}
@@ -362,5 +394,18 @@ impl<V, E> GeoGraph<V, E>
 		// }
 
 		println!("The following nodes have colour = {}: {:#?}", class, class_vec);
+	}
+
+	pub fn contraction(&mut self) {
+		let mut class_set = HashSet::new();
+		for node_index in self.graph.node_indices(){
+			match self.get_node(node_index){
+				Some(x)	=> {class_set.insert(x.classify_as());},
+				None	=> {;},
+			}
+		}
+		for class in class_set{
+			self.class_contraction(class);
+		}
 	}
 }

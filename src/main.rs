@@ -44,22 +44,50 @@ fn edge_info(g:&StableGraph<&(i32, i32), &(i32, i32), Undirected>, e:&EdgeIndex)
 
 fn main() {
 	println!("Hello, world!");
-	let mut deps = GeoGraph::<(f64, f64, f64), i32>::new();
-	let a = deps.add_node((2., 1., 3.));
-	let b = deps.add_node((2., 1., 2.));
-	let c = deps.add_node((2., 2., 3.));
-	let d = deps.add_node((4., 1., 2.));
-	//deps.node_info(&a);
-	//let e = 
-	deps.add_edge(&a, &b, 1);
-	deps.add_edge(&b, &c, 1);
-	deps.add_edge(&a, &c, 2);
-	deps.add_edge(&b, &d, 3);
-	//deps.edge_info(&e);
-	let mut lg = GeoGraph::<i32, i32>::line_graph(&mut deps, 0);
-	//println!("{:#?}", lg);
-	lg.class_contraction(1);
-	println!("{:#?}", lg);
+	
+	
+	// /== ESEMPIO 1
+	// let mut deps = GeoGraph::<(f64, f64, f64), i32>::new();
+	// let a = deps.add_node((2., 1., 3.));
+	// let b = deps.add_node((2., 1., 2.));
+	// let c = deps.add_node((2., 2., 3.));
+	// let d = deps.add_node((4., 1., 2.));
+	// //deps.node_info(&a);
+	// //let e = 
+	// deps.add_edge(&a, &b, 1);
+	// deps.add_edge(&b, &c, 1);
+	// deps.add_edge(&a, &c, 2);
+	// deps.add_edge(&b, &d, 3);
+	// //deps.edge_info(&e);
+	// println!("====THE ORIGINAL GRAPH IS====:\n{:#?}\n\n", deps);
+	// let mut lg = GeoGraph::<i32, i32>::line_graph(&mut deps, 1);
+
+	
+	let mut deps = GeoGraph::<char, (char, i32)>::new();
+	let a = deps.add_node('a');
+	let b = deps.add_node('b');
+	let c = deps.add_node('c');
+	let d = deps.add_node('d');
+	let e = deps.add_node('e');
+	let f = deps.add_node('f');
+
+	deps.add_edge(&a, &b, ('a', 3));
+	deps.add_edge(&a, &c, ('b', 1));
+	deps.add_edge(&b, &c, ('c', 2));
+	deps.add_edge(&b, &f, ('d', 4));
+	deps.add_edge(&c, &d, ('e', 2));
+	deps.add_edge(&c, &e, ('f', 2));
+	deps.add_edge(&c, &f, ('g', 1));
+	deps.add_edge(&d, &e, ('h', 1));
+	deps.add_edge(&e, &f, ('i', 3));
+
+	
+
+	println!("====THE ORIGINAL GRAPH IS====:\n{:#?}\n\n", deps);
+	let mut lg = GeoGraph::<(char, i32), i32>::line_graph(&mut deps, 1);
+	println!("====IT'S LINE GRAPH IS====:\n{:#?}\n\n", lg);
+	lg.contraction();
+	println!("====IT'S CONTRACTED LINE GRAPH IS====:\n{:#?}\n\n", lg);
 }
 
 	
