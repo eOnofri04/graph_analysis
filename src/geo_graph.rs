@@ -295,9 +295,12 @@ impl<V, E, Ty> GeoGraph<V, E, Ty>
 	/// Then it uses this Vec in order to contract adiacent vertex.
 	/// If a new node has been built the iteration starts over
 	/// in order to fullfill the problem with updating mutable iterators.
+	///
+	/// The function return a boolean value that tells if the contraption
+	/// has contracted any couple of nodes.
 
 	pub fn class_contraction(&mut self, class : i32) -> bool {
-		let DEBUG = true;
+		let DEBUG = false;
 		let mut theres_work = false;
 		let mut class_vec = Vec::new();
 		for node_index in self.graph.node_indices() {
@@ -334,12 +337,16 @@ impl<V, E, Ty> GeoGraph<V, E, Ty>
 					if self.are_neighbors(idx1, idx2) {
 						flag = true;
 						theres_work = true;
+
+						// NODE ADD
 						let new_idx = self.add_node(V::default_classifiable_node(class));
 						if DEBUG {
 							println!("\n\\\\ Contrapting nodes {:?} and {:?} into {:?}.", idx1, idx2, new_idx);
 						}
-						// ! TO DO for Direct Graphs
+
+						// EDGE update gatering
 						let mut to_add = Vec::new();
+						// gathering outgoing from edge1
 						for idxc in self.graph.neighbors_directed(idx1, Outgoing) {
 							match self.get_edge(&idx1, &idx2){
 								Some(x)	=> {
@@ -353,6 +360,7 @@ impl<V, E, Ty> GeoGraph<V, E, Ty>
 								None	=> {;},
 							}
 						}
+						// gathering outgoing from edge2
 						for idxc in self.graph.neighbors_directed(idx2, Outgoing) {
 							match self.get_edge(&idx2, &idx1){
 								Some(x)	=> {
@@ -366,7 +374,9 @@ impl<V, E, Ty> GeoGraph<V, E, Ty>
 								None	=> {;},
 							}
 						}
+						// gathering incoming if directed graph
 						if self.graph.is_directed(){
+							// gathering incoming to edge1
 							for idxc in self.graph.neighbors_directed(idx1, Incoming) {
 								match self.get_edge(&idx1, &idx2){
 									Some(x)	=> {
@@ -380,6 +390,7 @@ impl<V, E, Ty> GeoGraph<V, E, Ty>
 									None	=> {;},
 								}
 							}
+							// gathering incoming to edge2
 							for idxc in self.graph.neighbors_directed(idx2, Incoming) {
 								match self.get_edge(&idx2, &idx1){
 									Some(x)	=> {
@@ -395,13 +406,15 @@ impl<V, E, Ty> GeoGraph<V, E, Ty>
 							}
 						}
 						if DEBUG {
-							println!("\\\\ To add Edges : {:#?}", to_add);
+							println!("\\\\ Edges that need to be add: {:#?}", to_add);
 						}
+						// EDGE updating
 						for edge_data in to_add{
 							self.add_edge(&edge_data.0, &edge_data.1, edge_data.2);
 						}
 						self.remove_node(idx1);
 						self.remove_node(idx2);
+						// TO ADD
 						//class_vec.remove_item(&idx1);
 						//class_vec.remove_item(&idx2);
 						class_vec.push(new_idx);
@@ -414,58 +427,32 @@ impl<V, E, Ty> GeoGraph<V, E, Ty>
 			}
 		}
 
-		// let mut iter1 = class_vec.iter();
-		// loop {
-		// 	let idx1;
-		// 	match iter1.next() {
-		// 		Some(x)	=> idx1 = *x,
-		//		None	=> break,
-		// 	}
-		// 	let mut iter2 = iter1.clone();
-		// 	loop {
-		// 		let idx2;
-		// 		match iter2.next() {
-		// 			Some(x)	=> idx2 = *x,
-		// 			None	=> break,
-		// 		}
-		// 		if self.are_neighbors(idx1, idx2) {
-		// 			let new_idx = self.add_node(V::default_classifiable_node(class));
-		// 			//add edges
-		// 			self.remove_node(idx1);
-		// 			self.remove_node(idx2);
-		// 			// They Should Be Removed
-		// 			//class_vec.remove_item(&idx1);
-		// 			//class_vec.remove_item(&idx2);
-		// 			//class_vec.push(new_idx);
-		// 		}
-		// 	}
-		// }
-
 		println!("The following nodes have colour = {}: {:#?}", class, class_vec);
 		theres_work
 	}
 
 	pub fn contraction(&mut self) {
-		let mut theres_work = true;
-		let mut i = 1;
+		let DEBUG = true;
+		let mut theres_work;
 		
-		while theres_work{
-			println!("\n==== ITERATION NUMBER {:?} ====\n\n", i);
+		let mut class_set = HashSet::new();
 
-			let mut class_set = HashSet::new();
+		for node_index in self.graph.node_indices(){
+			match self.get_node(node_index){
+				Some(x)	=> {class_set.insert(x.classify_as());},
+				None	=> {;},
+			}
+		}
 
-			for node_index in self.graph.node_indices(){
-				match self.get_node(node_index){
-					Some(x)	=> {class_set.insert(x.classify_as());},
-					None	=> {;},
+		for class in class_set{
+			theres_work = self.class_contraction(class);
+			if DEBUG {
+				if theres_work {
+					println!("\\\\ Nodes contracted over class {:?}\n", class);
+				} else {
+					println!("\\\\ No nodes to be contracted over class {:?}\n", class);
 				}
 			}
-
-			theres_work = false;
-			for class in class_set{
-				theres_work = self.class_contraction(class) || theres_work;
-			}
-			i = i+1;
 		}
 	}
 }
