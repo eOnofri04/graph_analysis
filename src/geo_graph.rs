@@ -276,11 +276,12 @@ impl<V, E, Ty> GeoGraph<V, E, Ty>
 //***********************************************
 
 
-impl<V, E> GeoGraph<V, E>
+impl<V, E, Ty> GeoGraph<V, E, Ty>
 	where	V	:	std::fmt::Debug,
 			V	:	classifiable::Classifiable,
 			E	:	std::fmt::Debug,
 			E	:	combinable::Combinable<E>,
+			Ty	:	petgraph::EdgeType,
 {
 //	pub fn add_node(&mut self, p : (f64, f64, f64)) -> NodeIndex<DefaultIx> {
 //		self.graph.add_node(p)
@@ -337,8 +338,7 @@ impl<V, E> GeoGraph<V, E>
 						if DEBUG {
 							println!("\n\\\\ Contrapting nodes {:?} and {:?} into {:?}.", idx1, idx2, new_idx);
 						}
-						// ! TO DO
-						//add edges
+						// ! TO DO for Direct Graphs
 						let mut to_add = Vec::new();
 						for idxc in self.graph.neighbors_directed(idx1, Outgoing) {
 							match self.get_edge(&idx1, &idx2){
@@ -364,6 +364,34 @@ impl<V, E> GeoGraph<V, E>
 									}
 								}
 								None	=> {;},
+							}
+						}
+						if self.graph.is_directed(){
+							for idxc in self.graph.neighbors_directed(idx1, Incoming) {
+								match self.get_edge(&idx1, &idx2){
+									Some(x)	=> {
+										match self.get_edge(&idx1, &idxc){
+											Some(y)	=> {
+												to_add.push((idxc, new_idx, E::combine_elements(x, y)));
+											}
+											None => {;},
+										}
+									}
+									None	=> {;},
+								}
+							}
+							for idxc in self.graph.neighbors_directed(idx2, Incoming) {
+								match self.get_edge(&idx2, &idx1){
+									Some(x)	=> {
+										match self.get_edge(&idx2, &idxc){
+											Some(y)	=> {
+												to_add.push((idxc, new_idx, E::combine_elements(x, y)));
+											}
+											None => {;},
+										}
+									}
+									None	=> {;},
+								}
 							}
 						}
 						if DEBUG {
@@ -421,7 +449,7 @@ impl<V, E> GeoGraph<V, E>
 		let mut theres_work = true;
 		let mut i = 1;
 		
-		while (theres_work){
+		while theres_work{
 			println!("\n==== ITERATION NUMBER {:?} ====\n\n", i);
 
 			let mut class_set = HashSet::new();
