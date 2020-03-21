@@ -300,7 +300,7 @@ impl<V, E, Ty> GeoGraph<V, E, Ty>
 	/// has contracted any couple of nodes.
 
 	pub fn class_contraction(&mut self, class : i32) -> bool {
-		let DEBUG = false;
+		let DEBUG = true;
 		let mut theres_work = false;
 		let mut class_vec = Vec::new();
 		for node_index in self.graph.node_indices() {

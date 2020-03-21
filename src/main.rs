@@ -7,6 +7,7 @@ pub use petgraph::Directed;
 fn main() {
 	println!("Hello, world!");
 	
+	
 	let mut deps = GeoGraph::<(char, i32), i32, Directed>::new();
 	let a = deps.add_node(('a', 2));
 	let b = deps.add_node(('b', 2));
